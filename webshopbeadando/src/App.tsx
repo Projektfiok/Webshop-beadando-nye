@@ -7,6 +7,7 @@ import Registration from "./pages/Registration";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.css";
+import ProductList from "./pages/productList";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Routes>
       <Route path="/regisztracio" element={<Registration />} />
         <Route path="/" element={<Home />} />
+        <Route path="/products/categories" element={<ProductList />} />
       </Routes>
     </Router>
 
