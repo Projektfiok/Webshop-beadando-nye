@@ -9,6 +9,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.css";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import ProfileChange from "./pages/DataChange";
 import ProductList from "./pages/productList";
 
 
@@ -21,6 +22,7 @@ function App() {
       <Routes>
       <Route path="/regisztracio" element={<Registration />} />
         <Route path="/" element={<Home />} />
+        <Route path="/update" element={<ProfileChange />} />
         <Route path="/products/categories" element={<ProductList />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/bejelentkezes" element={<Login />} />
