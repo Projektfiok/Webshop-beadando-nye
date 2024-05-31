@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import ProfileChange from "./pages/DataChange";
 import ProductList from "./pages/productList";
+import SEARCHPAGE from './pages/searchPage';
+import PRODUCTPAGE from './pages/productPage';
 
 
 function App() {
@@ -26,6 +28,9 @@ function App() {
         <Route path="/products/categories" element={<ProductList />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/bejelentkezes" element={<Login />} />
+        <Route path="/search" element={<SEARCHPAGE />} />
+        <Route path='/search/:params' element={<SEARCHPAGE />}></Route>
+        <Route path='/product/:productId' element={<PRODUCTPAGE />} />
       </Routes>
     </Router>
 

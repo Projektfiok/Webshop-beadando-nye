@@ -1,0 +1,117 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  padding: 20px;
+}
+
+.search-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  max-width: 25vw;
+}
+
+.search-container h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.search-container div {
+  margin-bottom: 10px;
+}
+
+.search-container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.search-container input[type="text"],
+.search-container input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-container input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.search-container button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.search-container button:hover {
+  background-color: #218838;
+}
+
+.search-results-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-results-container .product {
+  display: block;
+  text-decoration: none;
+  color: #333;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-results-container .product img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+.search-results-container .product h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.search-results-container .product p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.search-results-container .pages {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.search-results-container .pages button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 5px;
+}
+
+.search-results-container .pages button:hover {
+  background-color: #0056b3;
+}
