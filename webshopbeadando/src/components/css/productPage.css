@@ -6,6 +6,18 @@
     width: fit-content;
     height: fit-content;
   }
+
+  .loading {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading .loader {
+    margin: 10px;
+  }
   
   .product-data {
     max-width: 800px;
@@ -56,4 +68,3 @@
     align-items: center;
     justify-content: center;
   }
-  

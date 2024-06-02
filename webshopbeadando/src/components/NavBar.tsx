@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBasket, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -12,6 +13,13 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ brandName, items }) => {
     const isLoggedIn = useAuth();
+    const [query, setQuery] = useState<string>('');
+    const navigate = useNavigate();
+
+    const search = () => {
+        navigate('/search/query=' + query);
+        setQuery('');
+    }
 
     return (
         <nav className="navbar navbar-expand-md navbar-grey bg-grey shadow">
@@ -24,13 +32,13 @@ const NavBar: React.FC<NavBarProps> = ({ brandName, items }) => {
                        <li key={index}>
                        {item === 'Home' ? (
                            <NavLink to="/">{item}</NavLink>
-                       ) : item === 'Keresés' ? (
-                           <NavLink to="/search">{item}</NavLink>
-                       ) : item === 'Bejelentkezés' && !isLoggedIn ? (
+                       ): item === 'Bejelentkezés' && !isLoggedIn ? (
                            <NavLink to="/bejelentkezes">{item}</NavLink>
                        ) : item === 'Regisztráció'  && !isLoggedIn ? (
                            <NavLink to="/regisztracio">{item}</NavLink>
-                       ) : null }
+                       ) : item === 'Search'  && !isLoggedIn ? (
+                        <NavLink to="/regisztracio">{item}</NavLink>
+                    ) : null }
                    </li>
                     ))}
                 </ul>
@@ -48,6 +56,15 @@ const NavBar: React.FC<NavBarProps> = ({ brandName, items }) => {
                         </div>
                     </>
                 )}
+                <form className="search-bar" onSubmit={search}>
+                    <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Keress egy termékre"
+                    />
+                    <button type="submit">Keresés</button>
+                </form>
             </div>
         </nav>
     );
