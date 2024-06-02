@@ -94,15 +94,15 @@ const SEARCHPAGE = () => {
         <button type="submit" onClick={search}>Search</button>
     </div>
 
-    <div className='search-results-container'>
+    <div className='results-container'>
       {products.length > 0 ? (
           products.map((product) => (
             <a key={product.id} className='product' href={'http://localhost:3000/product/' + product.id}>
               <img src={product.image} />
               <div className='data'>
                  <h3>{product.name}</h3>
-                <p>Price: {product.price}</p>
-                <p>Rating: {product.rating}/5</p>
+                <p>Price: {product.price} Ft</p>
+                <p>Rating: {'★'.repeat(product.rating)}</p>
                 <p>{product.stock > 0 ? 'Stock: ' + product.stock + ' products' : 'Not in stock'}</p>
               </div>
             </a>
@@ -110,11 +110,11 @@ const SEARCHPAGE = () => {
         ) : (
           <p>No results found</p>
         )}
+    </div>
 
-      <div className='pages'>
-        <button onClick={previousPage} >Previous</button>
-        <button onClick={nextPage} >Next</button>
-      </div>
+    <div className='pages'>
+      <button onClick={previousPage} >Previous</button>
+      <button onClick={nextPage} >Next</button>
     </div>
 
 
