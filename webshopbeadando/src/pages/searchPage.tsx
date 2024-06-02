@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { searchProducts } from '../components/searchProducts';
 import { createRequestURL } from '../components/searchProducts';
 import '../components/css/searchPage.css';
 
 const SEARCHPAGE = () => {
+  const navigate = useNavigate();
 
   const { params } = useParams<{ params: string }>();
   useEffect(() => {
@@ -113,8 +114,8 @@ const SEARCHPAGE = () => {
     </div>
 
     <div className='pages'>
-      <button onClick={previousPage} >Previous</button>
-      <button onClick={nextPage} >Next</button>
+      <button onClick={previousPage} >Previous page</button>
+      <button onClick={nextPage} >Next page</button>
     </div>
 
 
@@ -139,8 +140,8 @@ const SEARCHPAGE = () => {
       offset,
       limit,});
 
-      const url = 'http://localhost:3000/search/' + requestURL;
-      window.location.href = url;
+      const url = '/search/' + requestURL;
+      navigate(url);
   }
 
   function previousPage() {
@@ -165,8 +166,8 @@ const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
             offset : newOffset,
             limit,});
 
-      const url = 'http://localhost:3000/search/' + requestURL;
-      window.location.href = url;
+      const url = '/search/' + requestURL;
+      navigate(url);
     }
   }
 
@@ -194,8 +195,8 @@ const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
 
       console.log('request url: ' + requestURL);
       
-    const url = 'http://localhost:3000/search/' + requestURL;
-    window.location.href = url;
+      const url = '/search/' + requestURL;
+      navigate(url);
 }
 }
 
