@@ -13,12 +13,14 @@ import ProfileChange from "./pages/DataChange";
 import ProductList from "./pages/productList";
 import SEARCHPAGE from './pages/searchPage';
 import PRODUCTPAGE from './pages/productPage';
+import { AuthProvider } from "./pages/AuthContext"; 
 
 
 function App() {
   const navItems = ["Home", "Regisztráció", "Bejelentkezés", "Keresés"];
 
   return (
+    <AuthProvider>
     <Router>
        <NavBar brandName={"Webshop"} items={navItems} />
       <Routes>
@@ -33,6 +35,7 @@ function App() {
         <Route path='/product/:productId' element={<PRODUCTPAGE />} />
       </Routes>
     </Router>
+    </AuthProvider>
 
   );
 }
