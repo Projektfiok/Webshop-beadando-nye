@@ -16,9 +16,7 @@ const SEARCHPAGE = () => {
           searchParams.set('offset', '0');
           searchParams.set('limit', '100');
           const newParams = searchParams.toString();
-          console.log('new params: ' + newParams);
           const data = await searchProducts(newParams);
-          console.log('all data: ' + data.length);
           setAllProducts(data.length);
         }
       } catch (error) {
@@ -29,13 +27,11 @@ const SEARCHPAGE = () => {
     const get = async () => {
         try {
             if (params) {
-              console.log("params: " + params);
                 const data = await searchProducts(params);
                 setProducts(data);
             }
         } catch (error) {
             console.log(error);
-            
         }
     };
 
@@ -235,7 +231,6 @@ const SEARCHPAGE = () => {
 
   function nextPage() {
     const searchParams = new URLSearchParams("?" + params);
-    console.log(params);
     const offsetParam = searchParams.get('offset');
     const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
 
@@ -252,8 +247,6 @@ const SEARCHPAGE = () => {
       maxRate,
       offset: newOffset,
       limit,});
-
-      console.log('request url: ' + requestURL);
       
       const url = '/search/' + requestURL;
       navigate(url);
