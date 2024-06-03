@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import '../components/css/Profile.css';
+import { useAuth } from "./AuthContext";
 
 interface UserData {
   lastName: string;
@@ -8,9 +9,10 @@ interface UserData {
   email: string;
 }
 
-const App: React.FC = () => {
+const Profile: React.FC = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     fetchUser();
@@ -25,7 +27,7 @@ const App: React.FC = () => {
       });
 
       if (response.status === 401) {
-        setUser(null);
+        navigate("/bejelentkezes");
         return;
       }
 
@@ -36,33 +38,39 @@ const App: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    setUser(null); 
-    localStorage.removeItem("accessToken");
-    navigate("/"); 
-    window.location.reload();
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5000/logout", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+        }
+      });
+    } catch (error) {
+      console.error("Kijelentkezés hiba:", error);
+    } finally {
+      localStorage.removeItem("accessToken");
+      logout(); 
+      navigate("/bejelentkezes", { replace: true }); 
+    }
   };
 
   return (
     <div className="background">
       <div className="container">
         <h3 className="login-title">Felhasználói adatok</h3>
-        {user ? (
-          <div className="user-info">
-            <p>Email: {user.email}</p>
-            <p>Vezetéknév: {user.lastName}</p>
-            <p>Keresztnév: {user.firstName}</p>
-            <div className="button-container">
-              <button className="logout-button" onClick={handleLogout}>Kijelentkezés</button>
-              <NavLink className="link" to="/update">Adatok módosítása</NavLink>
-            </div>
+        <div className="user-info">
+          <p>Email: {user?.email}</p>
+          <p>Vezetéknév: {user?.lastName}</p>
+          <p>Keresztnév: {user?.firstName}</p>
+          <div className="button-container">
+            <button className="logout-button" onClick={handleLogout}>Kijelentkezés</button>
+            <NavLink className="link" to="/update">Adatok módosítása</NavLink>
           </div>
-        ) : (
-          <p>Kérjük, jelentkezzen be</p>
-        )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default App;
+export default Profile;
