@@ -49,6 +49,8 @@ interface Product {
         const data = await response.json();
         setProducts(data.data);
         setTotalProducts(data.total);
+        const totalPages = Math.ceil(data.total / limit);
+        if (totalPages <= 1 && offset !== 0) setOffset(0);
       } catch (error) {
         console.error(error);
         setProducts([]);
