@@ -17,6 +17,7 @@ interface Address {
   street: string;
   zip: string;
   phoneNumber?: string;
+  taxNumber?: string;
 }
 
 const ProfileChange: React.FC = () => {
@@ -39,7 +40,8 @@ const ProfileChange: React.FC = () => {
       country: '',
       city: '',
       street: '',
-      zip: ''
+      zip: '',
+      taxNumber: ''
     }
   });
 
@@ -85,6 +87,10 @@ const ProfileChange: React.FC = () => {
       if (!startsWithPlus.test(value)) {
         error = "Helytelen telefonszám formátum. A telefonszámnak '+' jellel kell kezdődnie.";
       }
+    } else if (name === 'taxNumber' && addressType === 'billingAddress') {
+      if (value.length !== 11) {
+        error = 'Az adószámnak 11 számjegyűnek kell lennie.';
+      }
     }
 
     setErrors(prevErrors => ({
@@ -126,6 +132,11 @@ const ProfileChange: React.FC = () => {
 
     if (!user.firstName || !user.lastName || !isAddressValid(user.shippingAddress) || !isAddressValid(user.billingAddress)) {
       setError('Minden mező kitöltése kötelező!');
+      return;
+    }
+
+    if (user.billingAddress.taxNumber && user.billingAddress.taxNumber.length !== 11) {
+      setError('Az adószámnak 11 számjegyűnek kell lennie.');
       return;
     }
 
@@ -320,6 +331,17 @@ const ProfileChange: React.FC = () => {
                 onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
               {errors['billingAddress.zip'] && <p className="error-message">{errors['billingAddress.zip']}</p>}
+            </label>
+            <label>
+              Adószám:
+              <input
+                type="text"
+                name="taxNumber"
+                value={user.billingAddress.taxNumber}
+                onChange={e => handleAddressChange(e, 'billingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
+              />
+              {errors['billingAddress.taxNumber'] && <p className="error-message">{errors['billingAddress.taxNumber']}</p>}
             </label>
           </div>
           {error && <p className="error-message">{error}</p>}
