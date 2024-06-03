@@ -17,7 +17,7 @@ import { AuthProvider } from "./pages/AuthContext";
 
 
 function App() {
-  const navItems = ["Home", "Regisztráció", "Bejelentkezés", "Keresés"];
+  const navItems = ["Home", "Regisztráció", "Bejelentkezés"];
 
   return (
     <AuthProvider>

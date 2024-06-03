@@ -2,8 +2,39 @@ import React, { useState, useEffect } from "react";
 import "../components/css/regis.css";
 import SuccessMessage from "../components/SuccessMessage";
 
+type Address = {
+  name: string;
+  country: string;
+  city: string;
+  street: string;
+  zip: string;
+  phoneNumber?: string;
+  taxNumber?: string;
+};
+
+type FormData = {
+  username: string;
+  password: string;
+  passwordConfirm: string;
+  firstName: string;
+  lastName: string;
+  shippingAddress: Address;
+  billingAddress: Address;
+};
+
+type ErrorMessages = {
+  submitError: string;
+  username: string;
+  password: string;
+  passwordConfirm: string;
+  firstName: string;
+  lastName: string;
+  shippingAddress: { [key: string]: string };
+  billingAddress: { [key: string]: string };
+};
+
 const RegistrationForm: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
     passwordConfirm: "",
@@ -28,14 +59,29 @@ const RegistrationForm: React.FC = () => {
   });
 
   const [sameAddress, setSameAddress] = useState(false);
-  const [errorMessages, setErrorMessages] = useState({
+  const [errorMessages, setErrorMessages] = useState<ErrorMessages>({
     submitError: "",
     username: "",
     password: "",
     passwordConfirm: "",
-    lastName: "",
     firstName: "",
-    phoneNumber: "",
+    lastName: "",
+    shippingAddress: {
+      name: "",
+      country: "",
+      city: "",
+      street: "",
+      zip: "",
+      phoneNumber: "",
+    },
+    billingAddress: {
+      name: "",
+      country: "",
+      city: "",
+      street: "",
+      zip: "",
+      taxNumber: "",
+    },
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
 
@@ -69,15 +115,32 @@ const RegistrationForm: React.FC = () => {
       username: "",
       password: "",
       passwordConfirm: "",
-      lastName: "",
       firstName: "",
-      phoneNumber: "",
+      lastName: "",
+      shippingAddress: {
+        name: "",
+        country: "",
+        city: "",
+        street: "",
+        zip: "",
+        phoneNumber: "",
+      },
+      billingAddress: {
+        name: "",
+        country: "",
+        city: "",
+        street: "",
+        zip: "",
+        taxNumber: "",
+      },
     });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked, dataset } = e.target;
-    const addressType = dataset.addressType;
+    const addressType = dataset.addressType as
+      | "shippingAddress"
+      | "billingAddress";
 
     let errorMsg = "";
 
@@ -90,7 +153,8 @@ const RegistrationForm: React.FC = () => {
         break;
       case "password":
         if (value.length < 8 || !/[a-z]/.test(value) || !/\d/.test(value)) {
-          errorMsg = "Jelszó minimum 8 karakter hosszú lehet, valamint tartalmaznia kell egy kisbetűt és számot";
+          errorMsg =
+            "Jelszó minimum 8 karakter hosszú lehet, valamint tartalmaznia kell egy kisbetűt és számot";
         }
         break;
       case "passwordConfirm":
@@ -98,11 +162,11 @@ const RegistrationForm: React.FC = () => {
           errorMsg = "Nem egyezik a jelszó";
         }
         break;
-      case "lastName":
-        errorMsg = value.trim() === "" ? "A vezetéknév nem lehet üres" : "";
-        break;
       case "firstName":
         errorMsg = value.trim() === "" ? "A keresztnév nem lehet üres" : "";
+        break;
+      case "lastName":
+        errorMsg = value.trim() === "" ? "A vezetéknév nem lehet üres" : "";
         break;
       case "phoneNumber":
         const phonePattern = /^\+[0-9]{10,14}$/;
@@ -111,34 +175,43 @@ const RegistrationForm: React.FC = () => {
         }
         break;
       default:
+        if (addressType) {
+          errorMsg = value.trim() === "" ? "A mező kitöltése kötelező" : "";
+        }
         break;
     }
 
-    setErrorMessages((prevErrors) => ({
-      ...prevErrors,
-      [name]: errorMsg,
-    }));
+    if (addressType) {
+      setErrorMessages((prevErrors) => ({
+        ...prevErrors,
+        [addressType]: {
+          ...prevErrors[addressType],
+          [name]: errorMsg,
+        },
+      }));
+    } else {
+      setErrorMessages((prevErrors) => ({
+        ...prevErrors,
+        [name]: errorMsg,
+      }));
+    }
 
     if (name === "sameAddress") {
       setSameAddress(checked);
     } else {
-      switch (addressType) {
-        case "shippingAddress":
-        case "billingAddress":
-          setFormData((prevState) => ({
-            ...prevState,
-            [addressType]: {
-              ...prevState[addressType],
-              [name]: value,
-            },
-          }));
-          break;
-        default:
-          setFormData((prevState) => ({
-            ...prevState,
-            [name]: type === "checkbox" ? checked : value,
-          }));
-          break;
+      if (addressType) {
+        setFormData((prevState) => ({
+          ...prevState,
+          [addressType]: {
+            ...prevState[addressType],
+            [name]: value,
+          },
+        }));
+      } else {
+        setFormData((prevState) => ({
+          ...prevState,
+          [name]: type === "checkbox" ? checked : value,
+        }));
       }
     }
   };
@@ -160,11 +233,14 @@ const RegistrationForm: React.FC = () => {
 
     setErrorMessages((prevErrors) => ({
       ...prevErrors,
-      ['submitError']: '',
+      ["submitError"]: "",
     }));
 
     const hasError = Object.values(errorMessages).some(
-      (errorMsg) => errorMsg !== ""
+      (errorMsg) =>
+        (typeof errorMsg === "string" && errorMsg !== "") ||
+        (typeof errorMsg === "object" &&
+          Object.values(errorMsg).some((msg) => msg !== ""))
     );
 
     if (hasError) {
@@ -180,29 +256,27 @@ const RegistrationForm: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
-      let errorMsg = '';
+      let errorMsg = "";
 
-      if (response.ok) { 
+      if (response.ok) {
         setShowSuccessMessage(true);
         handleReset();
       } else {
         if (response.status == 400) {
-          errorMsg = 'A bevitt adatok érvénytelenek';
+          errorMsg = "A bevitt adatok érvénytelenek";
           setErrorMessages((prevErrors) => ({
             ...prevErrors,
-            ['submitError']: errorMsg,
+            ["submitError"]: errorMsg,
           }));
         } else if (response.status == 409) {
-          errorMsg = 'A felhasználó már létezik';
+          errorMsg = "A felhasználó már létezik";
           setErrorMessages((prevErrors) => ({
             ...prevErrors,
-            ['submitError']: errorMsg,
+            ["submitError"]: errorMsg,
           }));
         }
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   return (
@@ -210,8 +284,8 @@ const RegistrationForm: React.FC = () => {
       <div className="registration-container">
         <h2>Regisztráció</h2>
         {errorMessages.submitError && (
-              <p className="error-message">{errorMessages.submitError}</p>
-            )}
+          <p className="error-message">{errorMessages.submitError}</p>
+        )}
         <form
           className="registration-form"
           onSubmit={handleSubmit}
@@ -287,8 +361,8 @@ const RegistrationForm: React.FC = () => {
             )}
           </div>
 
-          <div className="shipping-info">
-            <h3>Szállítási cím</h3>
+          <div className="address-info">
+            <h3>Szállítási Cím</h3>
             <label htmlFor="shippingName">Név:</label>
             <input
               type="text"
@@ -299,6 +373,12 @@ const RegistrationForm: React.FC = () => {
               onBlur={handleChange}
               required
             />
+            {errorMessages.shippingAddress.name && (
+              <p className="error-message">
+                {errorMessages.shippingAddress.name}
+              </p>
+            )}
+
             <label htmlFor="shippingCountry">Ország:</label>
             <input
               type="text"
@@ -309,6 +389,12 @@ const RegistrationForm: React.FC = () => {
               onBlur={handleChange}
               required
             />
+            {errorMessages.shippingAddress.country && (
+              <p className="error-message">
+                {errorMessages.shippingAddress.country}
+              </p>
+            )}
+
             <label htmlFor="shippingCity">Város:</label>
             <input
               type="text"
@@ -319,6 +405,12 @@ const RegistrationForm: React.FC = () => {
               onBlur={handleChange}
               required
             />
+            {errorMessages.shippingAddress.city && (
+              <p className="error-message">
+                {errorMessages.shippingAddress.city}
+              </p>
+            )}
+
             <label htmlFor="shippingStreet">Utca:</label>
             <input
               type="text"
@@ -329,6 +421,12 @@ const RegistrationForm: React.FC = () => {
               onBlur={handleChange}
               required
             />
+            {errorMessages.shippingAddress.street && (
+              <p className="error-message">
+                {errorMessages.shippingAddress.street}
+              </p>
+            )}
+
             <label htmlFor="shippingZip">Irányítószám:</label>
             <input
               type="text"
@@ -339,34 +437,43 @@ const RegistrationForm: React.FC = () => {
               onBlur={handleChange}
               required
             />
+            {errorMessages.shippingAddress.zip && (
+              <p className="error-message">
+                {errorMessages.shippingAddress.zip}
+              </p>
+            )}
+
             <label htmlFor="shippingPhoneNumber">Telefonszám:</label>
             <input
-              type="text"
+              type="tel"
               name="phoneNumber"
               data-address-type="shippingAddress"
               value={formData.shippingAddress.phoneNumber}
               onChange={handleChange}
               onBlur={handleChange}
-              required
             />
-            {errorMessages.phoneNumber && (
-              <p className="error-message">{errorMessages.phoneNumber}</p>
+            {errorMessages.shippingAddress.phoneNumber && (
+              <p className="error-message">
+                {errorMessages.shippingAddress.phoneNumber}
+              </p>
             )}
           </div>
 
-          <label>
-            A számlázási cím megegyezik a szállítási címmel
-            <input
-              type="checkbox"
-              name="sameAddress"
-              checked={sameAddress}
-              onChange={handleChange}
-            />
-          </label>
+          <div className="same-address">
+            <label htmlFor="sameAddress">
+              <input
+                type="checkbox"
+                name="sameAddress"
+                checked={sameAddress}
+                onChange={handleChange}
+              />
+              Szállítási cím megegyezik a számlázási címmel
+            </label>
+          </div>
 
           {!sameAddress && (
-            <div className="billing-info">
-              <h3>Számlázási cím</h3>
+            <div className="address-info">
+              <h3>Számlázási Cím</h3>
               <label htmlFor="billingName">Név:</label>
               <input
                 type="text"
@@ -374,8 +481,15 @@ const RegistrationForm: React.FC = () => {
                 data-address-type="billingAddress"
                 value={formData.billingAddress.name}
                 onChange={handleChange}
+                onBlur={handleChange}
                 required
               />
+              {errorMessages.billingAddress.name && (
+                <p className="error-message">
+                  {errorMessages.billingAddress.name}
+                </p>
+              )}
+
               <label htmlFor="billingCountry">Ország:</label>
               <input
                 type="text"
@@ -383,8 +497,15 @@ const RegistrationForm: React.FC = () => {
                 data-address-type="billingAddress"
                 value={formData.billingAddress.country}
                 onChange={handleChange}
+                onBlur={handleChange}
                 required
               />
+              {errorMessages.billingAddress.country && (
+                <p className="error-message">
+                  {errorMessages.billingAddress.country}
+                </p>
+              )}
+
               <label htmlFor="billingCity">Város:</label>
               <input
                 type="text"
@@ -392,8 +513,15 @@ const RegistrationForm: React.FC = () => {
                 data-address-type="billingAddress"
                 value={formData.billingAddress.city}
                 onChange={handleChange}
+                onBlur={handleChange}
                 required
               />
+              {errorMessages.billingAddress.city && (
+                <p className="error-message">
+                  {errorMessages.billingAddress.city}
+                </p>
+              )}
+
               <label htmlFor="billingStreet">Utca:</label>
               <input
                 type="text"
@@ -401,8 +529,15 @@ const RegistrationForm: React.FC = () => {
                 data-address-type="billingAddress"
                 value={formData.billingAddress.street}
                 onChange={handleChange}
+                onBlur={handleChange}
                 required
               />
+              {errorMessages.billingAddress.street && (
+                <p className="error-message">
+                  {errorMessages.billingAddress.street}
+                </p>
+              )}
+
               <label htmlFor="billingZip">Irányítószám:</label>
               <input
                 type="text"
@@ -410,8 +545,15 @@ const RegistrationForm: React.FC = () => {
                 data-address-type="billingAddress"
                 value={formData.billingAddress.zip}
                 onChange={handleChange}
+                onBlur={handleChange}
                 required
               />
+              {errorMessages.billingAddress.zip && (
+                <p className="error-message">
+                  {errorMessages.billingAddress.zip}
+                </p>
+              )}
+
               <label htmlFor="billingTaxNumber">Adószám:</label>
               <input
                 type="text"
@@ -419,6 +561,7 @@ const RegistrationForm: React.FC = () => {
                 data-address-type="billingAddress"
                 value={formData.billingAddress.taxNumber}
                 onChange={handleChange}
+                onBlur={handleChange}
               />
             </div>
           )}
