@@ -7,7 +7,19 @@ body {
   padding: 0;
 }
 
+.stock-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 14px;
+}
+
+.stock-row input {
+  margin-right: 10px;
+}
+
 .search-container {
+  font-size: 16px;
   padding: 20px;
   background-color: #fff;
   margin: 20px auto;
@@ -49,6 +61,24 @@ body {
 
 .search-container button:hover {
   background-color: #0056b3;
+}
+
+.results-empty-container {
+  width: 97vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.results-empty {
+  position: relative;
+  width: 60%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 20px;
 }
 
 .results-container {

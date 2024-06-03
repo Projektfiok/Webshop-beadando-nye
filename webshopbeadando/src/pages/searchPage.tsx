@@ -1,13 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { searchProducts } from '../components/searchProducts';
 import { createRequestURL } from '../components/searchProducts';
 import '../components/css/searchPage.css';
 
 const SEARCHPAGE = () => {
-
+  const navigate = useNavigate();
   const { params } = useParams<{ params: string }>();
+
   useEffect(() => {
+    const getAll = async () => {
+      try {
+        if (params) {
+          const searchParams = new URLSearchParams(params);
+          searchParams.set('offset', '0');
+          searchParams.set('limit', '100');
+          const newParams = searchParams.toString();
+          console.log('new params: ' + newParams);
+          const data = await searchProducts(newParams);
+          console.log('all data: ' + data.length);
+          setAllProducts(data.length);
+        }
+      } catch (error) {
+          console.log(error);
+      }
+    };
+
     const get = async () => {
         try {
             if (params) {
@@ -21,30 +39,48 @@ const SEARCHPAGE = () => {
         }
     };
 
+    getAll();
     get();
 }, [params]);
 
 
+  const [allProducts, setAllProducts] = useState<number>(0);
   const [products, setProducts] = useState<any[]>([]);
   const [query, setQuery] = useState<string>('');
-  const [inStock, setInStock] = useState<boolean>(true);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [orderBy, setOrderBy] = useState<string>('name.ASC');
-  const [offset, setOffset] = useState<number>();
+  const [inStock, setInStock] = useState<boolean | undefined>();  
+  const [offset, setOffset] = useState<number>(0);
   const [limit, setLimit] = useState<number>(6);
 
   const [minPrice, setMinPrice] = useState<number | undefined>();
   const [maxPrice, setMaxPrice] = useState<number | undefined>();
   const [minRate, setMinRate] = useState<number | undefined>();
   const [maxRate, setMaxRate] = useState<number | undefined>();
+
+  const handleMinRateChange = (rate: number) => {
+    if (rate <= 5 && rate >= 1) {
+      setMinRate(rate);
+    }
+    if (rate === undefined || rate === null || rate > 5 || rate < 1) {
+      setMinRate(1);
+    }
+  };
+
+  const handleMaxRateChange = (rate: number) => {
+    if (rate >= 1 && rate <= 5) {
+      setMaxRate(rate);
+    }
+    if (rate === undefined || rate === null || rate > 5 || rate < 1) {
+      setMaxRate(5);
+    }
+  };
   
   return (
   <main>
-    <div className='search-container'>
-      <h2>Product Search</h2>
+    <form className='search-container' onSubmit={search}>
+      <h2>Termékek keresése</h2>
 
         <div>
-          <label>Query: </label>
+          <label>Keress szó alapján: </label>
           <input
             type="text"
             value={query}
@@ -52,7 +88,7 @@ const SEARCHPAGE = () => {
           />
         </div>
         <div>
-          <label>Min Price: </label>
+          <label>Minimum ár: </label>
           <input
             type="number"
             value={minPrice}
@@ -60,7 +96,7 @@ const SEARCHPAGE = () => {
           />
         </div>
         <div>
-          <label>Max Price: </label>
+          <label>Maximum ár: </label>
           <input
             type="number"
             value={maxPrice}
@@ -68,31 +104,46 @@ const SEARCHPAGE = () => {
           />
         </div>
         <div>
-          <label>In Stock: </label>
-          <input
-            type="checkbox"
-            checked={inStock}
-            onChange={(e) => setInStock(e.target.checked)}
-          />
+          <label>Raktáron: </label>
+          <div className='stock-row'>
+            <input
+              type="radio"
+              name='stock'
+              id='inStock'
+              checked={inStock}
+              onChange={(e) => setInStock(true)}
+            />
+            <label htmlFor="inStock">Raktáron</label>
+          </div>
+          <div className='stock-row'>
+            <input
+              type="radio"
+              name='stock'
+              id='notInStock'
+              checked={inStock}
+              onChange={(e) => setInStock(false)}
+            />
+            <label htmlFor="notInStock">Elfogyott</label>
+          </div>        
         </div>
         <div>
-          <label>Min Rate: </label>
+          <label>Minimum értékelés: </label>
           <input
             type="number"
             value={minRate}
-            onChange={(e) => setMinRate(Number(e.target.value))}
+            onChange={(e) => handleMinRateChange(Number(e.target.value))}
           />
         </div>
         <div>
-          <label>Max Rate: </label>
+          <label>Maximum értékelés: </label>
           <input
             type="number"
             value={maxRate}
-            onChange={(e) => setMaxRate(Number(e.target.value))}
+            onChange={(e) => handleMaxRateChange(Number(e.target.value))}
           />
         </div>
-        <button type="submit" onClick={search}>Search</button>
-    </div>
+        <button type="submit">Keresés</button>
+    </form>
 
     <div className='results-container'>
       {products.length > 0 ? (
@@ -101,20 +152,27 @@ const SEARCHPAGE = () => {
               <img src={product.image} />
               <div className='data'>
                  <h3>{product.name}</h3>
-                <p>Price: {product.price} Ft</p>
-                <p>Rating: {'★'.repeat(product.rating)}</p>
-                <p>{product.stock > 0 ? 'Stock: ' + product.stock + ' products' : 'Not in stock'}</p>
+                <p>Ár: {product.price} Ft</p>
+                <p>Értékelés: {'★'.repeat(product.rating)}</p>
+                <p>{product.stock > 0 ? 'Készlet: ' + product.stock + 'db raktáron' : 'Nincs raktáron'}</p>
               </div>
             </a>
           ))
         ) : (
-          <p>No results found</p>
+          <div className='results-empty-container'>
+            <p className='results-empty'>Nem található a keresés feltételeinek megfelelő termék</p>
+          </div>
         )}
     </div>
 
     <div className='pages'>
-      <button onClick={previousPage} >Previous</button>
-      <button onClick={nextPage} >Next</button>
+      {offset != 0 && (
+        <button onClick={previousPage} >Előző oldal</button>
+      )}
+
+      {offset+limit < allProducts && (
+        <button onClick={nextPage} >Következő oldal</button>
+      )}
     </div>
 
 
@@ -125,7 +183,17 @@ const SEARCHPAGE = () => {
     setOffset(0);
     setLimit(6);
 
+    if (minRate??0 > 5) {
+      setMinRate(5);
+    } else if (minRate??0 < 0) {
+      setMinRate(0);
+    }
 
+    if (maxRate??0 < 0) {
+      setMaxRate(0);
+    } else if (maxRate??0 > 5) {
+      setMaxRate(5);
+    }
 
     let requestURL = createRequestURL({
       query,
@@ -134,20 +202,17 @@ const SEARCHPAGE = () => {
       inStock,
       minRate,
       maxRate,
-      categories,
-      orderBy,
       offset,
       limit,});
 
-      const url = 'http://localhost:3000/search/' + requestURL;
-      window.location.href = url;
+      const url = '/search/' + requestURL;
+      navigate(url);
   }
 
   function previousPage() {
-const searchParams = new URLSearchParams("?" + params);
-console.log(params);
-const offsetParam = searchParams.get('offset');
-const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
+    const searchParams = new URLSearchParams("?" + params);
+    const offsetParam = searchParams.get('offset');
+    const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
 
     if (offset > 0) {
       const newOffset = offset-limit;
@@ -160,13 +225,11 @@ const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
             inStock,
             minRate,
             maxRate,
-            categories,
-            orderBy,
             offset : newOffset,
             limit,});
 
-      const url = 'http://localhost:3000/search/' + requestURL;
-      window.location.href = url;
+      const url = '/search/' + requestURL;
+      navigate(url);
     }
   }
 
@@ -187,15 +250,13 @@ const offset = offsetParam !== null ? parseInt(offsetParam) : 0;
       inStock,
       minRate,
       maxRate,
-      categories,
-      orderBy,
       offset: newOffset,
       limit,});
 
       console.log('request url: ' + requestURL);
       
-    const url = 'http://localhost:3000/search/' + requestURL;
-    window.location.href = url;
+      const url = '/search/' + requestURL;
+      navigate(url);
 }
 }
 

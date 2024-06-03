@@ -29,12 +29,14 @@ export const searchProducts = async (params: string) => {
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Response was not ok');
         }
 
         const data = await response.json();
         console.log('Search results:', data.data);
-        console.log(params);
+        console.log('params in searchProducts(): ' + params);
+        console.log('request url in search products: ' + requestUrl);
+        
         return data.data;
     } catch (error) {
         console.error('Fetch error:', error);
