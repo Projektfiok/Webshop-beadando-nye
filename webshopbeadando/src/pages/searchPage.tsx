@@ -106,7 +106,6 @@ const SEARCHPAGE = () => {
               type="radio"
               name='stock'
               id='inStock'
-              checked={inStock}
               onChange={(e) => setInStock(true)}
             />
             <label htmlFor="inStock">Raktáron</label>
@@ -116,7 +115,6 @@ const SEARCHPAGE = () => {
               type="radio"
               name='stock'
               id='notInStock'
-              checked={inStock}
               onChange={(e) => setInStock(false)}
             />
             <label htmlFor="notInStock">Elfogyott</label>
