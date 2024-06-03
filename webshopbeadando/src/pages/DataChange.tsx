@@ -44,6 +44,7 @@ const ProfileChange: React.FC = () => {
   });
 
   const [error, setError] = useState<string>('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -56,7 +57,7 @@ const ProfileChange: React.FC = () => {
 
         if (response.status === 401) {
           localStorage.removeItem('accessToken');
-          navigate('/bejelentkezés');
+          navigate('/bejelentkezes');
           return;
         }
 
@@ -74,12 +75,31 @@ const ProfileChange: React.FC = () => {
     fetchUserData();
   }, [navigate]);
 
+  const validateField = (name: string, value: string, addressType?: 'shippingAddress' | 'billingAddress') => {
+    let error = '';
+
+    if (!value) {
+      error = 'A mező kitöltése kötelező';
+    } else if (name === 'phoneNumber' && addressType === 'shippingAddress') {
+      const startsWithPlus: RegExp = /^\+/;
+      if (!startsWithPlus.test(value)) {
+        error = "Helytelen telefonszám formátum. A telefonszámnak '+' jellel kell kezdődnie.";
+      }
+    }
+
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      [`${addressType ? `${addressType}.` : ''}${name}`]: error
+    }));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser(prevState => ({
       ...prevState,
       [name]: value
     }));
+    validateField(name, value);
   };
 
   const handleAddressChange = (
@@ -87,15 +107,6 @@ const ProfileChange: React.FC = () => {
     addressType: 'shippingAddress' | 'billingAddress'
   ) => {
     const { name, value } = e.target;
-    let error: string = '';
-
-    if (name === 'phoneNumber') {
-      const startsWithPlus: RegExp = /^\+/;
-      if (!startsWithPlus.test(value)) {
-        error = "Helytelen telefonszám formátum. A telefonszámnak '+' jellel kell kezdődnie.";
-      }
-    }
-
     setUser(prevState => ({
       ...prevState,
       [addressType]: {
@@ -103,7 +114,7 @@ const ProfileChange: React.FC = () => {
         [name]: value
       }
     }));
-    setError(error);
+    validateField(name, value, addressType);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,7 +141,7 @@ const ProfileChange: React.FC = () => {
 
       if (response.status === 401) {
         localStorage.removeItem('accessToken');
-        navigate('/bejelentkezés');
+        navigate('/bejelentkezes');
         return;
       }
 
@@ -166,7 +177,9 @@ const ProfileChange: React.FC = () => {
                 name="firstName"
                 value={user.firstName}
                 onChange={handleChange}
+                onBlur={e => validateField(e.target.name, e.target.value)}
               />
+              {errors.firstName && <p className="error-message">{errors.firstName}</p>}
             </label>
           </div>
           <div>
@@ -177,7 +190,9 @@ const ProfileChange: React.FC = () => {
                 name="lastName"
                 value={user.lastName}
                 onChange={handleChange}
+                onBlur={e => validateField(e.target.name, e.target.value)}
               />
+              {errors.lastName && <p className="error-message">{errors.lastName}</p>}
             </label>
           </div>
           <div>
@@ -189,7 +204,9 @@ const ProfileChange: React.FC = () => {
                 name="name"
                 value={user.shippingAddress.name}
                 onChange={e => handleAddressChange(e, 'shippingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'shippingAddress')}
               />
+              {errors['shippingAddress.name'] && <p className="error-message">{errors['shippingAddress.name']}</p>}
             </label>
             <label>
               Ország:
@@ -198,7 +215,9 @@ const ProfileChange: React.FC = () => {
                 name="country"
                 value={user.shippingAddress.country}
                 onChange={e => handleAddressChange(e, 'shippingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'shippingAddress')}
               />
+              {errors['shippingAddress.country'] && <p className="error-message">{errors['shippingAddress.country']}</p>}
             </label>
             <label>
               Város:
@@ -207,7 +226,9 @@ const ProfileChange: React.FC = () => {
                 name="city"
                 value={user.shippingAddress.city}
                 onChange={e => handleAddressChange(e, 'shippingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'shippingAddress')}
               />
+              {errors['shippingAddress.city'] && <p className="error-message">{errors['shippingAddress.city']}</p>}
             </label>
             <label>
               Utca:
@@ -216,7 +237,9 @@ const ProfileChange: React.FC = () => {
                 name="street"
                 value={user.shippingAddress.street}
                 onChange={e => handleAddressChange(e, 'shippingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'shippingAddress')}
               />
+              {errors['shippingAddress.street'] && <p className="error-message">{errors['shippingAddress.street']}</p>}
             </label>
             <label>
               Irányítószám:
@@ -225,7 +248,9 @@ const ProfileChange: React.FC = () => {
                 name="zip"
                 value={user.shippingAddress.zip}
                 onChange={e => handleAddressChange(e, 'shippingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'shippingAddress')}
               />
+              {errors['shippingAddress.zip'] && <p className="error-message">{errors['shippingAddress.zip']}</p>}
             </label>
             <label>
               Telefonszám:
@@ -234,7 +259,9 @@ const ProfileChange: React.FC = () => {
                 name="phoneNumber"
                 value={user.shippingAddress.phoneNumber}
                 onChange={e => handleAddressChange(e, 'shippingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'shippingAddress')}
               />
+              {errors['shippingAddress.phoneNumber'] && <p className="error-message">{errors['shippingAddress.phoneNumber']}</p>}
             </label>
           </div>
           <div>
@@ -246,7 +273,9 @@ const ProfileChange: React.FC = () => {
                 name="name"
                 value={user.billingAddress.name}
                 onChange={e => handleAddressChange(e, 'billingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
+              {errors['billingAddress.name'] && <p className="error-message">{errors['billingAddress.name']}</p>}
             </label>
             <label>
               Ország:
@@ -255,7 +284,9 @@ const ProfileChange: React.FC = () => {
                 name="country"
                 value={user.billingAddress.country}
                 onChange={e => handleAddressChange(e, 'billingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
+              {errors['billingAddress.country'] && <p className="error-message">{errors['billingAddress.country']}</p>}
             </label>
             <label>
               Város:
@@ -264,7 +295,9 @@ const ProfileChange: React.FC = () => {
                 name="city"
                 value={user.billingAddress.city}
                 onChange={e => handleAddressChange(e, 'billingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
+              {errors['billingAddress.city'] && <p className="error-message">{errors['billingAddress.city']}</p>}
             </label>
             <label>
               Utca:
@@ -273,7 +306,9 @@ const ProfileChange: React.FC = () => {
                 name="street"
                 value={user.billingAddress.street}
                 onChange={e => handleAddressChange(e, 'billingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
+              {errors['billingAddress.street'] && <p className="error-message">{errors['billingAddress.street']}</p>}
             </label>
             <label>
               Irányítószám:
@@ -282,7 +317,9 @@ const ProfileChange: React.FC = () => {
                 name="zip"
                 value={user.billingAddress.zip}
                 onChange={e => handleAddressChange(e, 'billingAddress')}
+                onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
+              {errors['billingAddress.zip'] && <p className="error-message">{errors['billingAddress.zip']}</p>}
             </label>
           </div>
           {error && <p className="error-message">{error}</p>}
