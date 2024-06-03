@@ -15,7 +15,6 @@ const NavBar: React.FC<NavBarProps> = ({ brandName, items }) => {
     const { isLoggedIn } = useAuth();
     const [query, setQuery] = useState<string>('');
     const navigate = useNavigate();
-
     const search = (event: React.FormEvent) => {
         event.preventDefault();
         navigate('/search/query=' + query);

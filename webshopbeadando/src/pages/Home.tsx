@@ -2,17 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../components/css/Home.css";
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  ratings: Record<string, number>;
-  categories: string[];
-  stock: number;
-}
-
 interface Category {
   id: string;
   name: string;
@@ -34,7 +23,6 @@ const HOME: React.FC = () => {
         throw new Error("Hiba a kategóriák lekérdezése során");
       }
       const data = await response.json();
-      console.log(data);
       const categoriesWithRandomImages = data.map((category: Category) => ({
         ...category,
         image: `${category.image}?random=${Math.random()}`,
