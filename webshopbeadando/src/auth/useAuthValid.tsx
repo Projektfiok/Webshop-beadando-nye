@@ -8,7 +8,7 @@ const useAuthValid = () => {
     const validateToken = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        navigate('/bejelentkezés');
+        navigate('/bejelentkezes');
         return;
       }
 
@@ -19,12 +19,12 @@ const useAuthValid = () => {
 
         if (response.status === 401) {
           localStorage.removeItem("accessToken");
-          navigate('/bejelentkezés');
+          navigate('/bejelentkezes');
         }
       } catch (err) {
         console.error("Error validating token:", err);
         localStorage.removeItem("accessToken");
-        navigate('/bejelentkezés');
+        navigate('/bejelentkezes');
       }
     };
 
