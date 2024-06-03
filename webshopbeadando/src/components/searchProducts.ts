@@ -35,6 +35,8 @@ export const searchProducts = async (params: string) => {
         const data = await response.json();
         console.log('Search results:', data.data);
         console.log('params in searchProducts(): ' + params);
+        console.log('request url in search products: ' + requestUrl);
+        
         return data.data;
     } catch (error) {
         console.error('Fetch error:', error);
