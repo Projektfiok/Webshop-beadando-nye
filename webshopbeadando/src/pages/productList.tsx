@@ -42,8 +42,6 @@ interface Product {
   
     const fetchProducts = async (category: string, orderBy: string, offset: number, limit: number) => {
       try {
-        console.log(`http://localhost:5000/products?categories=${category}&orderBy=${orderBy}&offset=${offset}&limit=${limit}`);
-        
         const response = await fetch(`http://localhost:5000/products?categories=${category}&orderBy=${orderBy}&offset=${offset}&limit=${limit}`);
         if (!response.ok) {
           throw new Error('Hiba a termékek lekérdezése során');
@@ -51,9 +49,6 @@ interface Product {
         const data = await response.json();
         setProducts(data.data);
         setTotalProducts(data.total);
-        console.log(data);
-        
-        
       } catch (error) {
         console.error(error);
         setProducts([]);
