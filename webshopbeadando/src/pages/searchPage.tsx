@@ -76,7 +76,7 @@ const SEARCHPAGE = () => {
   
   return (
   <main>
-    <div className='search-container'>
+    <form className='search-container' onSubmit={search}>
       <h2>Termékek keresése</h2>
 
         <div>
@@ -142,8 +142,8 @@ const SEARCHPAGE = () => {
             onChange={(e) => handleMaxRateChange(Number(e.target.value))}
           />
         </div>
-        <button type="submit" onClick={search}>Keresés</button>
-    </div>
+        <button type="submit">Keresés</button>
+    </form>
 
     <div className='results-container'>
       {products.length > 0 ? (
