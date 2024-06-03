@@ -54,7 +54,7 @@ const RegistrationForm: React.FC = () => {
       city: "",
       street: "",
       zip: "",
-      taxNumber: "",
+      taxNumber: "00000000000",
     },
   });
 
@@ -174,6 +174,11 @@ const RegistrationForm: React.FC = () => {
           errorMsg = "Helytelen telefonszám (Használja a +36 formátumot)";
         }
         break;
+      case "taxNumber":
+        if (value && value.length !== 11) {
+          errorMsg = "Adószámnak legalább 11 karakternek kell lennie";
+        }
+        break;
       default:
         if (addressType) {
           errorMsg = value.trim() === "" ? "A mező kitöltése kötelező" : "";
@@ -233,7 +238,7 @@ const RegistrationForm: React.FC = () => {
 
     setErrorMessages((prevErrors) => ({
       ...prevErrors,
-      ["submitError"]: "",
+      submitError: "",
     }));
 
     const hasError = Object.values(errorMessages).some(
@@ -262,21 +267,23 @@ const RegistrationForm: React.FC = () => {
         setShowSuccessMessage(true);
         handleReset();
       } else {
-        if (response.status == 400) {
+        if (response.status === 400) {
           errorMsg = "A bevitt adatok érvénytelenek";
           setErrorMessages((prevErrors) => ({
             ...prevErrors,
-            ["submitError"]: errorMsg,
+            submitError: errorMsg,
           }));
-        } else if (response.status == 409) {
+        } else if (response.status === 409) {
           errorMsg = "A felhasználó már létezik";
           setErrorMessages((prevErrors) => ({
             ...prevErrors,
-            ["submitError"]: errorMsg,
+            submitError: errorMsg,
           }));
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Hiba a regisztráció során:", error);
+    }
   };
 
   return (
@@ -553,8 +560,7 @@ const RegistrationForm: React.FC = () => {
                   {errorMessages.billingAddress.zip}
                 </p>
               )}
-
-              <label htmlFor="billingTaxNumber">Adószám:</label>
+<label htmlFor="billingTaxNumber">Adószám:</label>
               <input
                 type="text"
                 name="taxNumber"
@@ -562,9 +568,19 @@ const RegistrationForm: React.FC = () => {
                 value={formData.billingAddress.taxNumber}
                 onChange={handleChange}
                 onBlur={handleChange}
+                onFocus={(e) => e.target.value=""}
+                
               />
+              {errorMessages.billingAddress.taxNumber && (
+                <p className="error-message">
+                  {errorMessages.billingAddress.taxNumber}
+                </p>
+              )}
+             
             </div>
+            
           )}
+           
 
           <div className="buttons">
             <button type="submit">Regisztráció</button>
