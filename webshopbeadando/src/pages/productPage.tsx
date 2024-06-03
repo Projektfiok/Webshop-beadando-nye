@@ -19,7 +19,7 @@ const PRODUCTPAGE = () => {
                     setLoading(false);
                 }
             } catch (error) {
-                document.title = 'Unknown product';
+                document.title = 'Ismeretlen termék';
                 setLoading(false);
             }
         };
@@ -36,7 +36,7 @@ const PRODUCTPAGE = () => {
                         <li className="ball"></li>
                         <li className="ball"></li>
                     </div>
-                    <p>Loading product...</p>
+                    <p>Termék betöltése...</p>
                 </div>
                 
             </main>
@@ -51,11 +51,11 @@ const PRODUCTPAGE = () => {
                     <h1>{productData.name}</h1>
                     <img src={productData.image}/>
                     <p>{productData.description}</p>
-                    <p>Price: {productData.price} Ft</p>
-                    <p>Rating: {'★'.repeat(productData.rating)}</p>
-                    <p>In-stock: {productData.stock} units</p>
+                    <p>Ár: {productData.price} Ft</p>
+                    <p>Értékelés: {'★'.repeat(productData.rating)}</p>
+                    <p>Raktáron: {productData.stock} units</p>
                     <div className='categories'>
-                        <h2>Categories</h2>
+                        <h2>Kategóriák:</h2>
                         <ul>
                             {productData.categories?.map((category: any) => (
                                 <li key={category}>
@@ -71,8 +71,8 @@ const PRODUCTPAGE = () => {
                 </div>
             ) : (
                 <main className='main container'>
-                    <p>This product does not exist</p>
-                    <p>Click <Link to="/">here</Link> to return Home</p>
+                    <p>A termék nem létezik</p>
+                    <p>Kattints <Link to="/">ide</Link> a Home-ra lépéshez</p>
                 </main>
             ) }
         </main>

@@ -24,7 +24,7 @@ function App() {
     <Router>
        <NavBar brandName={"Webshop"} items={navItems} />
       <Routes>
-      <Route path="/regisztracio" element={<Registration />} />
+        <Route path="/regisztracio" element={<Registration />} />
         <Route path="/" element={<Home />} />
         <Route path="/update" element={<ProfileChange />} />
         <Route path="/products/categories" element={<ProductList />} />

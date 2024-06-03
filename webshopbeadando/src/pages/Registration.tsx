@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../components/css/regis.css";
 import SuccessMessage from "../components/SuccessMessage";
+import { useNavigate } from "react-router-dom";
 
 type Address = {
   name: string;
@@ -84,6 +85,15 @@ const RegistrationForm: React.FC = () => {
     },
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      navigate("/profil");
+    }
+  }, [navigate]);
 
   const handleReset = () => {
     setFormData({
@@ -266,6 +276,7 @@ const RegistrationForm: React.FC = () => {
       if (response.ok) {
         setShowSuccessMessage(true);
         handleReset();
+        
       } else {
         if (response.status === 400) {
           errorMsg = "A bevitt adatok érvénytelenek";
