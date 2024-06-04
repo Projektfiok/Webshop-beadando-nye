@@ -17,7 +17,7 @@ interface Address {
   street: string;
   zip: string;
   phoneNumber?: string;
-  taxNumber?: string;
+  taxNumber?: string | null;
 }
 
 const ProfileChange: React.FC = () => {
@@ -77,20 +77,26 @@ const ProfileChange: React.FC = () => {
     fetchUserData();
   }, [navigate]);
 
-  const validateField = (name: string, value: string, addressType?: 'shippingAddress' | 'billingAddress') => {
+  const validateField = (name: string, value: string | null, addressType?: 'shippingAddress' | 'billingAddress') => {
     let error = '';
 
-    if (!value) {
+    if (!value && name !== 'taxNumber') {
       error = 'A mező kitöltése kötelező';
     } else if (name === 'phoneNumber' && addressType === 'shippingAddress') {
       const startsWithPlus: RegExp = /^\+/;
-      if (!startsWithPlus.test(value)) {
+      if (!startsWithPlus.test(value!)) {
         error = "Helytelen telefonszám formátum. A telefonszámnak '+' jellel kell kezdődnie.";
       }
-    } else if (name === 'taxNumber' && addressType === 'billingAddress') {
+    } else if (name === 'taxNumber' && value !== null && value !== '' && addressType === 'billingAddress') {
       if (value.length !== 11) {
         error = 'Az adószámnak 11 számjegyűnek kell lennie.';
+      } else if (!/^\d{11}$/.test(value)) {
+        error = 'Az adószámnak csak számokat lehet tartalmaznia.';
       }
+    }
+
+    if (name === 'taxNumber' && value === '') {
+      value = null;
     }
 
     setErrors(prevErrors => ({
@@ -117,10 +123,10 @@ const ProfileChange: React.FC = () => {
       ...prevState,
       [addressType]: {
         ...prevState[addressType],
-        [name]: value
+        [name]: value === '' ? null : value 
       }
     }));
-    validateField(name, value, addressType);
+    validateField(name, value === '' ? null : value, addressType); 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,7 +141,7 @@ const ProfileChange: React.FC = () => {
       return;
     }
 
-    if (user.billingAddress.taxNumber && user.billingAddress.taxNumber.length !== 11) {
+    if (user.billingAddress.taxNumber && user.billingAddress.taxNumber.toString().length !== 11) {
       setError('Az adószámnak 11 számjegyűnek kell lennie.');
       return;
     }
@@ -337,7 +343,7 @@ const ProfileChange: React.FC = () => {
               <input
                 type="text"
                 name="taxNumber"
-                value={user.billingAddress.taxNumber}
+                value={user.billingAddress.taxNumber??''}
                 onChange={e => handleAddressChange(e, 'billingAddress')}
                 onBlur={e => validateField(e.target.name, e.target.value, 'billingAddress')}
               />
