@@ -88,12 +88,12 @@ const ProfileChange: React.FC = () => {
         error = "Helytelen telefonszám formátum. A telefonszámnak '+' jellel kell kezdődnie.";
       }
     } else if (name === 'taxNumber' && value !== null && value !== '' && addressType === 'billingAddress') {
-      if (value.length !== 11) {
-        error = 'Az adószámnak 11 számjegyűnek kell lennie.';
-      } else if (!/^\d{11}$/.test(value)) {
-        error = 'Az adószámnak csak számokat lehet tartalmaznia.';
+      const taxNumberControl: RegExp = /^\d{11}$/;
+      if (!taxNumberControl.test(value)) {
+        error = 'Az adószámnak 11 számjegyűnek kell lennie, és csak számokat tartalmazhat.';
       }
     }
+
 
     if (name === 'taxNumber' && value === '') {
       value = null;
