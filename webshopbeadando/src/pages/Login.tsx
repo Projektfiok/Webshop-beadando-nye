@@ -7,6 +7,8 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
   const { isLoggedIn, login, logout } = useAuth();
 
@@ -22,22 +24,35 @@ const Login: React.FC = () => {
   };
 
   const validatePassword = (password: string) => {
-    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const re = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,}$/;
     return re.test(password);
   };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateEmail(username)) {
-      setError("Hibás e-mail formátum");
-      return;
+    let valid = true;
+    if (!username) {
+      setUsernameError("Mező kitöltése kötelező");
+      valid = false;
+    } else if (!validateEmail(username)) {
+      setUsernameError("Hibás e-mail formátum");
+      valid = false;
+    } else {
+      setUsernameError("");
     }
 
-    if (!validatePassword(password)) {
-      setError("A jelszónak legalább 8 karakter hosszúnak kell lennie, és tartalmaznia kell betűket és számokat");
-      return;
+    if (!password) {
+      setPasswordError("Mező kitöltése kötelező");
+      valid = false;
+    } else if (!validatePassword(password)) {
+      setPasswordError("A jelszónak legalább 8 karakter hosszúnak kell lennie, és tartalmaznia kell legalább egy darab kisbetűt és számot");
+      valid = false;
+    } else {
+      setPasswordError("");
     }
+
+    if (!valid) return;
 
     try {
       const response = await fetch("http://localhost:5000/user/login", {
@@ -53,8 +68,7 @@ const Login: React.FC = () => {
       }
 
       const data = await response.json();
-      localStorage.setItem("accessToken", data.accessToken);
-      login(); 
+      login(data.accessToken);  
       setError(""); 
       navigate("/", { replace: true }); 
     } catch (error) {
@@ -83,9 +97,9 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  required
                   autoComplete="email"
                 />
+                {usernameError && <div className="error-message">{usernameError}</div>}
               </div>
               <div className="form-group">
                 <label htmlFor="password" className="form-label">Jelszó:</label>
@@ -96,9 +110,9 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                   autoComplete="current-password"
                 />
+                {passwordError && <div className="error-message">{passwordError}</div>}
               </div>
               {error && <div className="error-message">{error}</div>}
               <button type="submit" className="submit-button">Bejelentkezés</button>
