@@ -1,30 +1,28 @@
 import React, { createContext, useState, useEffect, ReactNode, useContext } from "react";
+import useToken from "../components/useToken";  
 
 interface AuthContextProps {
   isLoggedIn: boolean;
-  login: () => void;
+  login: (token: string) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const { token, setToken, removeToken } = useToken();  
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!token);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
+    setIsLoggedIn(!!token);
+  }, [token]);
 
-  const login = () => {
-    setIsLoggedIn(true);
+  const login = (userToken: string) => {
+    setToken(userToken);
   };
 
   const logout = () => {
-    localStorage.removeItem("accessToken");
-    setIsLoggedIn(false);
+    removeToken();
   };
 
   return (
@@ -37,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = (): AuthContextProps => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth probléma");
+    throw new Error("AuthProvider probléma");
   }
   return context;
 };
